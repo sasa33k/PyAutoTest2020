@@ -2,7 +2,7 @@
 
 This project aims to allow normal users to manage their own auto test cases with Excel only.
 
-#### Key Features:
+### Key Features:
 * Excel Auto Testing Template
     * **Define which test to run**: users can manage all test cases in one file but select to run cases as neeed.
     * **Repeat by tests & cases with dynamic variables**: some times you just need to repeat the whole case with different paramenters e.g. going to yahoo.com and repeat to search different keywords. Manage it with data sheet tab!
@@ -16,10 +16,10 @@ This project aims to allow normal users to manage their own auto test cases with
             * Just like that! [ ([1,2,3],[1,2,3]) , (4,5) ] , [ ([1,2,3],[1,2,3]) , (4,5) ]
 * Web Test with Selenium - quick and high accuracy (currently support Chrome only =P , default version 81 included)
 * GUI Test by image or position (to handle non-web test~ of course..) ** special handling done for mac retina display
-* And some bugs~XD (forgive me i am not really a developer~ haha)
+* And some bugs~ XD (forgive me i am not really a developer... haha)
 * Check out more in PyAutoTest\tests\AutoTestTemplate.xlsx
 
-####Test folder structure 
+### Test folder structure 
 (Tested for Windows executable, similar structure can be found in PyAutoTest/tests):
 <pre>
 [AutoTesting]
@@ -45,7 +45,7 @@ This project aims to allow normal users to manage their own auto test cases with
     * Allow PyCharm to controm Accessibility & Screenrecording? in system preference
 5. Run PyAutoTest\\\_\_main\_\_.py
 
-## Step to build executable
+### Step to build executable
 (tested on windows os), one file executable
 <pre>
 pyinstaller PyTest.spec PyAutoTest\__main__.py
