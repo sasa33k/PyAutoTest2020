@@ -1,0 +1,7 @@
+six==1.14.0
+openpyxl==3.0.3
+selenium==3.141.0
+pyautogui==0.9.50
+configparser==5.0.0
+pywin32-ctypes==0.2.0
+#pywin32==227
