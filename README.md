@@ -36,7 +36,7 @@ This project aims to allow normal users to manage their own auto test cases with
 </pre>
 
 
-####Steps to setup the project (in PyCharm) 
+#### Steps to setup the project (in PyCharm) 
 1. Add interpreter (pyCharm most bottom right) --> create venv
 2. Go to requirements.txt ==> click install (pip install -r requirements.txt)
 3. Check Config.ini and update if required
