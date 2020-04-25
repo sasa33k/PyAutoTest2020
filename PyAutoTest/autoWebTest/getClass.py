@@ -11,13 +11,14 @@ from selenium.common.exceptions import TimeoutException
 
 class Switcher(object):
     # Setup Get functions
-    def Get(self, browser, getParam = None, getMethod = None, winHandle = None):
+    def Get(self, logger, browser, getParam = None, getMethod = None, winHandle = None):
         self.waitTimeout = 5
         self.browser = browser
         self.getMethod = getMethod
         self.getParam = getParam
         self.parent_handle = winHandle
-        print("    ... Getting: " + str(getParam) + " " + str(getMethod))
+        self.logger = logger
+        logger.info("    ... Getting: " + str(getParam) + " " + str(getMethod))
         
         
         method=getattr(self, "By"+getMethod, lambda :'Invalid')
@@ -30,6 +31,8 @@ class Switcher(object):
         size = len(handles);
         for x in range(size):
             if handles[x] != self.parent_handle:
+                self.logger.info("Switch to New Window...")
+                self.logger.info(handles[x])
                 self.browser.switch_to.window(handles[x])
                 #print self.browser.title;
                 #self.browser.close();
@@ -37,7 +40,9 @@ class Switcher(object):
                 break;
         return None
     
-    def ByOriWin(self):    
+    def ByOriWin(self):
+        self.logger.info("Switch to Original Window... ")
+        self.logger.info(self.parent_handle)
         self.browser.switch_to.window(self.parent_handle)
         return None
     

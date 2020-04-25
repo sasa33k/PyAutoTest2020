@@ -24,13 +24,14 @@ def convertPos(txtPos):
 
 class Switcher(object):
     # Setup Get functions
-    def Get(self, resolutionFactor=1, getParam = None, getMethod = None, dirName = '.'):
+    def Get(self, logger, resolutionFactor=1, getParam = None, getMethod = None, dirName = '.'):
         self.speed = 0.1
         self.resol = resolutionFactor
         self.getMethod = getMethod
         self.getParam = getParam
         self.dirName = dirName
-        print("    ... Locating: " + getParam + " By " + getMethod)
+        self.logger = logger
+        logger.info("    ... Locating: " + getParam + " By " + getMethod)
         
         
         method=getattr(self, "By"+getMethod, lambda :'Invalid')
@@ -39,21 +40,22 @@ class Switcher(object):
     
     # Get By Actions
     def ByImg(self):
-        print(self.getParam)
+        #print(self.getParam)
         imgPath = os.path.join(self.dirName, 'img', self.getParam)
-        print(imgPath)
-        numRepeat = 1
+        self.logger.info(imgPath)
+        numRepeat = 2
         elemPos = None
 
         # Retry 3 Times
-        error=''
-        while (elemPos == None) and (numRepeat > 0):
-            print("Getting element: repeat " + str(numRepeat))
+        error = 'Element not found'
+        while (elemPos is None) and (numRepeat > 0):
+            self.logger.info("Getting element: repeat " + str(numRepeat))
             try:
-                elemPos = pyautogui.locateCenterOnScreen(imgPath)
+                elemPos =  pyautogui.locateCenterOnScreen(imgPath, confidence=0.95)
+
             except Exception as e:
-                error=str(e)
-                print(e)
+                error = str(e)
+                self.logger.error(e)
                 sleep(3)
             numRepeat -= 1
         
@@ -71,7 +73,7 @@ class Switcher(object):
                 pyautogui.moveTo(elemPos[0]*self.resol,elemPos[1]*self.resol,1)
             else:
                 pyautogui.moveRel(elemPos[0]*self.resol,elemPos[1]*self.resol,1)
-            print("moved to: " + str(elemPos))
+            self.logger.info("moved to: " + str(elemPos))
             
             return elemPos
      
@@ -79,7 +81,7 @@ class Switcher(object):
             
             elemPos = convertPos(self.getParam)
             pyautogui.moveRel(elemPos[0]*self.resol,elemPos[1]*self.resol,1)
-            print("moved relatively: " + str(elemPos))
+            self.logger.info("moved relatively: " + str(elemPos))
             
             return elemPos   
         

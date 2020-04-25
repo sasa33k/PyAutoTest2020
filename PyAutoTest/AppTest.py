@@ -17,6 +17,5 @@ os = input('OS Name [win or %s]' % osName)
 dirN = dirN or dirName
 fileN = fileN or fileName
 os = os or osName
-print(dirN + fileN + ".xlsx")
+print(dirN + "/" + fileN + ".xlsx")
 runCaseUtil.run(dirN, fileN, os)
-    

@@ -16,12 +16,13 @@ def convertKey(txtKey):
     
 class Switcher(object):
     # Setup Do functions
-    def Do(self, element, DoAction, DoParamX, DoParamY):
+    def Do(self, logger, element, DoAction, DoParamX, DoParamY):
         self.element = element
         self.DoAction = DoAction
         self.DoParamX = DoParamX
         self.DoParamY = DoParamY
-        print("    ... Doing: " + self.DoAction)
+        self.logger = logger
+        logger.info("    ... Doing: " + self.DoAction)
         method=getattr(self, DoAction, lambda :'Invalid')
         return method()
 

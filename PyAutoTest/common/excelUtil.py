@@ -47,9 +47,10 @@ def validateTitle(expTitle, dataTitle):
     #Validate Title: Sheet Names, Step Title
     
     if (all(elem in dataTitle  for elem in expTitle)):
-        return(True)
+        return True
     else:
         print("Template Title mismatch...")
+        return False
 
 def containElement(element, data):
     # Check if Row / column contain element

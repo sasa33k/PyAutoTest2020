@@ -13,11 +13,11 @@ import pyautogui
 
 
 
-def ProcessStep(resolutionFactor, step, t, saveDir,seq="", caseID=0, dirName='.'):
+def ProcessStep(resolutionFactor, logger, step, t, saveDir,seq="", caseID=0, dirName='.'):
     element = None
     screenName = str(seq)+"_"+str(caseID)+"_"+ str(step[t.stepID])
     screenPath = saveDir+screenName
-    print("    ... " + str(step) + " | " + util.xstr(step[t.getElement]) + " . " + util.xstr(step[t.action]))
+    logger.info("    ... " + str(step) + " | " + util.xstr(step[t.getElement]) + " . " + util.xstr(step[t.action]))
     # Get Something if step[3] GetElement not empty
     if(step[t.getElement]!="" and step[t.getElement]!=None):
         #element = Get(browser)
@@ -28,17 +28,17 @@ def ProcessStep(resolutionFactor, step, t, saveDir,seq="", caseID=0, dirName='.'
         #element = g.Get(getParam, getMethod)
         
         try:
-            element = g.Get(resolutionFactor, getParam, getMethod, dirName)
+            element = g.Get(logger, resolutionFactor, getParam, getMethod, dirName)
         except Exception as e:
-            print("*** EXCEPTION: " + str(e))
-            print("Get Exception occur")
+            logger.error("*** EXCEPTION: " + str(e))
+            logger.error("Get Exception occur")
             pyautogui.screenshot(screenPath + "_getException.png");
             return ['=HYPERLINK(".\\' +screenName+'_getException.png","getException")', False, "Get Exception occurs: "+str(e)]
         
-        print()    
-        print(element)
-        print(type(element))
-        print()
+        logger.info("--")
+        logger.info(element)
+        logger.info(type(element))
+        logger.info("--")
     # check if element NOT exist (returned string) = failed
     if(isinstance(element, str) and step[t.action] != "Wait" ):
         result = ['=HYPERLINK(".\\' +screenName+'_getException.png","getException")',False, element]
@@ -50,11 +50,11 @@ def ProcessStep(resolutionFactor, step, t, saveDir,seq="", caseID=0, dirName='.'
         DoParamY = step[t.actionParamY]
         s=actionClass.Switcher()
         try:
-            result = s.Do(element, DoAction, DoParamX, DoParamY)
-            print(screenPath + "_DoException.png")
+            result = s.Do(logger, element, DoAction, DoParamX, DoParamY)
+            #print(screenPath + "_DoException.png")
         
         except Exception as e:
-            print("Action Exception occur: " + str(e))
+            logger.error("Action Exception occur: " + str(e))
             pyautogui.screenshot(screenPath + "_DoException.png");
             return ['=HYPERLINK(".\\' +screenName+'_DoException.png","doException")', False, "Action Exception occurs"]
         

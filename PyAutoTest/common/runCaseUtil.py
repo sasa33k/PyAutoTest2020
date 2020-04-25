@@ -34,7 +34,7 @@ def run(dirName, fileName, osName, logger, resPath):
     ## check if display is retina for mac
     if subprocess.call("system_profiler SPDisplaysDataType | grep -i 'retina'", shell=True) == 0:
         resolutionFactor = 0.5
-
+    logger.info("resolution factor: " + str(resolutionFactor))
 
     ### Load Test Template file
     wb = excelUtil.load(readPath)
@@ -59,17 +59,18 @@ def run(dirName, fileName, osName, logger, resPath):
     finalTitle = scenTitle + ['CaseRepeatID', 'CaseResult'] + caseTitle + stepTitle + ['Screenshot', 'Result',
                                                                                        'Message']
 
-    containWebTest = excelUtil.containElement(ActionType.web.value, dataSheet['C'])
+    # containWebTest = excelUtil.containElement(ActionType.web.value, dataSheet['C'])
     validStepTitle = excelUtil.validateTitle(Template.stepTitle.value, stepTitle)
 
     logger.info(finalTitle)
-    print()
+    logger.info("--")
 
     runCaseSteps = []
     for i in range(len(testCases) - 1):
         runCaseSteps += CaseSteps(wb, testSteps[1:], testCases[i + 1], True)
-        print(CaseSteps(wb, testSteps[1:], testCases[i + 1], True))
-    print()
+        logger.info("Case Steps: ")
+        logger.info(CaseSteps(wb, testSteps[1:], testCases[i + 1], True))
+    logger.info("--")
     finalSummary = []
     finalSummary.append(["Start Time: " + datetime.now().strftime("%d-%b-%Y, %H:%M:%S")])
     finalSummary.append(["Test Name", "Final Result"])
@@ -78,7 +79,7 @@ def run(dirName, fileName, osName, logger, resPath):
     if (validStepTitle):
 
         ## Create directory for result file and screenshots
-        print("Creating Directory")
+        logger.info("Creating Directory")
         if not os.path.exists(saveResultDir):
             os.mkdir(saveResultDir)
             logger.info("Directory " + saveResultDir + " Created ")
@@ -91,35 +92,39 @@ def run(dirName, fileName, osName, logger, resPath):
         else:
             logger.info("Directory " + saveDir + " already exists")
 
-        print()
+        logger.info("--")
 
         for i in range(len(testScenarios) - 1):
             isRun = testScenarios[i + 1][0]
+            runInit = testScenarios[i + 1][1]
             param = testScenarios[i + 1][2]
             testId = testScenarios[i + 1][3]
-            print(testScenarios)
+            logger.info("Test Scenarios: ")
+            logger.info(testScenarios)
             testName = str(testId) + "_" + testScenarios[i + 1][4]
             if (isRun == "Yes"):
-                print()
-                print("********************")
-                print("Running for test: " + testName)
+                logger.info("--")
+                logger.info("********************")
+                logger.info("Reading Cases in test: " + testName)
                 runTestSteps = CaseSteps(wb, runCaseSteps, testScenarios[i + 1][3:], False, 2)
 
-                print()
-
+                logger.info("--")
+                containWebTest = False
                 for s in runTestSteps:
-                    print(s)
+                    if s[8] == ActionType.web.value:
+                        containWebTest = True
+                    logger.info(s)
 
-                print("********************")
+                logger.info("********************")
 
                 ## Process Test Steps
-                print("Processing Test Steps in Case X ...")
-                print(finalTitle)
+                logger.info("Processing Test Steps in Case X ...")
+                logger.info(finalTitle)
                 t = Step(finalTitle)
                 # ** IF have web test
-                if (containWebTest):
-                    print(".. Include web tests")
-                    browser = webTest.Init(param, osName, resPath)
+                if containWebTest:
+                    logger.info(".. Include web tests")
+                    browser = webTest.Init(param, osName, resPath, logger, runInit)
                     initialWin = webTest.InitialWin(browser)
                     browser.maximize_window()
 
@@ -149,31 +154,31 @@ def run(dirName, fileName, osName, logger, resPath):
                     step = tmpStep
                     result = []
 
-                    print(step)
+                    logger.info(step)
                     ## Selenium web browser teststep
                     if (step[t.actionType] == AT.ActionType.web.value):
-                        print("    Web | " + str(step[t.stepID]) + " : " + util.xstr(step[t.stepDesc]) + util.xstr(
+                        logger.info("    Web | " + str(step[t.stepID]) + " : " + util.xstr(step[t.stepDesc]) + util.xstr(
                             step[t.getElement]))
-                        result = webTest.ProcessStep(browser, step, t, saveDir + "/", seqName, step[2],
+                        result = webTest.ProcessStep(browser, logger, step, t, saveDir + "/", seqName, step[2],
                                                      initialWin)  # 0: testID, 2: caseID
-                        print(gp.savedParam)
+                        logger.info(gp.savedParam)
 
-                        print("    >>> " + str(result))
+                        logger.info("    >>> " + str(result))
 
                     ## PyWinAuto windows application teststep
                     elif (step[t.actionType] == AT.ActionType.win.value):
-                        print("    Win | " + str(step[t.stepID]) + " : " + step[t.stepDesc])
+                        logger.info("    Win | " + str(step[t.stepID]) + " : " + step[t.stepDesc])
                         # webTest.ProcessStep(browser, step, t, saveDir+"/", seqName, step[2]) # 0: testID, 2: caseID
                         result = [None, None, "WIP"]
                     ## PyAutoGUI GUI teststep
                     elif (step[t.actionType] == AT.ActionType.gui.value):
-                        print("    GUI | " + str(step[t.stepID]) + " : " + step[t.stepDesc])
-                        result = guiTest.ProcessStep(resolutionFactor, step, t, saveDir + "/", seqName,
+                        logger.info("    GUI | " + str(step[t.stepID]) + " : " + step[t.stepDesc])
+                        result = guiTest.ProcessStep(resolutionFactor, logger, step, t, saveDir + "/", seqName,
                                                      step[2], dirName)  # 0: testID, 2: caseID
 
 
                     else:
-                        print("XXXXXXX " + str(t.actionType))
+                        logger.info("XXXXXXX " + str(t.actionType))
                         result = [None, False, "No Action Matched"]
 
                     resultData.append([seq] + step[2:] + result)
@@ -182,11 +187,11 @@ def run(dirName, fileName, osName, logger, resPath):
                         stepResults.append(result[1])
 
                     else:
-                        print("~~ " + prevCaseRepeatID + step[2])
+                        logger.info("~~ " + prevCaseRepeatID + step[2])
                         caseResult.append(all(stepResults))
                         while startSeq < seq:
                             resultData[startSeq + 1][2] = all(stepResults)
-                            print(str(startSeq) + str(all(stepResults)))
+                            logger.info(str(startSeq) + str(all(stepResults)))
                             startSeq += 1
 
                         stepResults = []
@@ -206,27 +211,28 @@ def run(dirName, fileName, osName, logger, resPath):
                 if (containWebTest):
                     browser = webTest.Quit(browser)
 
-                print()
-                print("Total " + str(seq) + " steps executed")
+                logger.info("--")
+                logger.info("Total " + str(seq) + " steps executed")
             else:
-                print("--- Skip Test " + testName)
+                logger.info("--- Skip Test " + testName)
     else:
-        print("Template not valid. ")
+        logger.error("Template not valid. ")
 
     #### Write result data
+    logger.info("Write result data... ")
     for s in finalResultData:
-        print(s)
+        logger.info(s)
         for i in s:
-            print(" ... " + str(i))
-    print(" ... ")
+            logger.info(" ... " + str(i))
+    logger.info(" ... ")
     for s in finalSummary:
-        print(s)
-    print(" ... ")
+        logger.info(s)
+    logger.info(" ... ")
 
     finalSummary[0].append("End Time: " + datetime.now().strftime("%d-%b-%Y, %H:%M:%S"))
     if (len(finalResultData) > 0):
         try:
             excelUtil.write(finalSummary, finalResultData, savePath)
-            print("Test Completed!")
+            logger.info("Test Completed!")
         except:
-            print("Error in Writing Excel")
+            logger.error("Error in Writing Excel")

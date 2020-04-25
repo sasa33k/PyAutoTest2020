@@ -12,13 +12,14 @@ import PyAutoTest.common.GlobalParam as gp
 
 class Switcher(object):
     # Setup Do functions
-    def Do(self, browser, element, DoAction, DoParamX, DoParamY):
+    def Do(self, logger, browser, element, DoAction, DoParamX, DoParamY):
         self.browser = browser
         self.element = element
         self.DoAction = DoAction
         self.DoParamX = DoParamX
         self.DoParamY = DoParamY
-        print("    ... Doing: " + self.DoAction)
+        self.logger = logger
+        logger.info("    ... Doing: " + self.DoAction)
         method=getattr(self, DoAction, lambda :'Invalid')
         return method()
 

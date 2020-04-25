@@ -4,7 +4,7 @@ Created on Sep 28, 2019
 @author: Sasa33k
 
 '''
-import configparser
+import configparser, datetime
 import sys, os
 
 import PyAutoTest.common.runCaseUtil as runCaseUtil
@@ -37,43 +37,58 @@ def run():
         log_path_default = config.get('LOGGER', 'path')
         log_level_default = config.get('LOGGER', 'level')
         resPath_default = config.get('INIT', 'resPath')
+        dirName_default = config.get('INIT', 'dirName')
+        resPath_default = config.get('INIT', 'resPath')
 
         if (reqInput == 'Y'):
-            print('Use Default Config? [%(path)s, %(lv)s, %(res)s]' % {'path':log_path_default, 'lv':log_level_default, 'res': resPath_default})
-            defCon = input('type "N" for custom config')
+            print('Use Default Config? [%(path)s, %(lv)s, %(res)s, %(dirN)s ]' % {'path':log_path_default, 'lv':log_level_default, 'res': resPath_default, 'dirN': dirName})
+            defCon = input('type "N" for custom config: ')
 
         if (defCon == 'N'):
-            log_path_input = input('Log Path [%s]' % log_path)
-            log_level_input = input('Log Level [%s]' % log_level)
-            resPath_input = input('Resource Path [%s]' % resPath)
+            log_path_input = input('Log Path [%s]: ' % log_path)
+            log_level_input = input('Log Level [%s]: ' % log_level)
+            resPath_input = input('Resource Path [%s]: ' % resPath)
+            dirName_input = input('Test Folder Path [%s]: ' % dirName)
             log_path = log_path or log_path_input
             log_level = log_level or log_level_input
             resPath = resPath or resPath_input
+            dirName = dirName or dirName_input
         else:
             log_path = log_path_default
             log_level = log_level_default
+            dirName = dirName_default
+            resPath = resPath_default
 
-        dirName = config.get('INIT', 'dirName')
+
         fileName = config.get('INIT', 'fileName')
         osName = config.get('INIT', 'osName')
         reqInput = config.get('INIT', 'reqInput')
-        resPath = config.get('INIT', 'resPath')
+
     except:
         print("Welcome to PyAutoTest")
+        print("Error occur when getting default configs....")
+
 
     logger = Logger()
     logger.init(log_path, log_level)
+    logger.info("")
+    logger.info("---------")
+    logger.info("PyAutoTest setup started...  ")
+    logger.info("---------")
+
 
     if (reqInput == 'Y'):
         ### User Input
-        dir = input('Test Folder [%s]' % dirName)
-        file = input('File Name [%s]' % fileName)
-        ps = input('OS Name [win or mac]: %s' % osName)
-        dir = dir or dirName
+        file = input('File Name [%s]: ' % fileName)
+        ps = input('OS Name [win or mac]: %s: ' % osName)
         file = file or fileName
         osn = ps or osName
-        print(dir + file + '.xlsx')
-        runCaseUtil.run(dir, file, osn, logger, resPath)
+        logger.info("App.RunCaseUtil By Input: " + dirName + file + '.xlsx')
+        ##try:
+        runCaseUtil.run(dirName, file, osn, logger, resPath)
+        #except Exception as e:
+        #    logger.error("App.RunCaseUtil: " + str(e))
+        #    input('Press Enter to Exit... ')
     else:
         runCaseUtil.run(dirName, fileName, osName, logger, resPath)
-        print(dirName + fileName + '.xlsx')
+        logger.info("App.RunCaseUtil Default: " + dirName + fileName + '.xlsx')
